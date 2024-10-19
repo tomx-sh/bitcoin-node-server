@@ -7,24 +7,22 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load() // Load the .env file
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	LoadEnv()
 
 	app := fiber.New()
 
 	// Middleware for API key protection
 	app.Use(func(c *fiber.Ctx) error {
-		if os.Getenv("NODE_ENV") == "development" {
+		if os.Getenv("ENV") == "local" {
 			return c.Next()
 		}
+
 		apiKey := c.Get("x-api-key")
 		if apiKey != os.Getenv("API_KEY") {
+			log.Printf("Unauthorized access with wrong API key")
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 		}
 		return c.Next()

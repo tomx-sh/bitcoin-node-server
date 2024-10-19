@@ -1,0 +1,6 @@
+To run the project for development, run the following command:
+`go run ./app`
+
+To build the project, run the following command:
+`make build-local` for local build
+`make build-target` for target build
