@@ -21,7 +21,7 @@ func main() {
 		}
 
 		apiKey := c.Get("x-api-key")
-		if apiKey != os.Getenv("API_KEY") {
+		if apiKey != os.Getenv("RPC_API_KEY") {
 			log.Printf("Unauthorized access with wrong API key")
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 		}

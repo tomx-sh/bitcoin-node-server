@@ -1,6 +1,19 @@
-To run the project for development, run the following command:
-`go run ./app`
+To run the project during development, run `go run ./app`.
 
-To build the project, run the following command:
-`make build-local` for local build
-`make build-target` for target build
+
+To build the project, run:
+* `make build-local` for local build
+* `make build-target` for target build
+
+
+To run the project on the target, run the following command:
+```bash
+export ENV=production
+export RPC_USERNAME=prod_username
+export RPC_PASSWORD=prod_password
+export RPC_URL=http://localhost:8332
+./dist/target/bitcoin-node-server
+```
+
+Or if you want to avoid setting the environment variables every time you run the project, you can
+add them in your shell configuration file (e.g. ~/.bashrc, ~/.bash_profile, ~/.zshrc, etc.)
