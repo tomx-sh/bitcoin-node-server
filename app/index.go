@@ -16,7 +16,7 @@ func main() {
 
 	// Middleware for API key protection
 	app.Use(func(c *fiber.Ctx) error {
-		if os.Getenv("ENV") == "local" {
+		if os.Getenv("RPC_ENV") == "development" {
 			return c.Next()
 		}
 

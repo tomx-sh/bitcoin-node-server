@@ -11,4 +11,5 @@ func LoadEnv() {
 	if err != nil {
 		fmt.Println("No .env file found. Using system environment variables.")
 	}
+	fmt.Println(".env loaded successfully.")
 }
