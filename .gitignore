@@ -1,5 +1,4 @@
 .env
 .env.*
-
-./dist
+/dist
 .DS_Store
