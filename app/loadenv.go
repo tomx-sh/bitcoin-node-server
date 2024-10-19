@@ -18,9 +18,8 @@ func LoadEnv() {
 		}
 
 	} else {
-		if env == "" {
-			os.Setenv("ENV", "local")
-		}
+		// No matter what, if not prod, it's local
+		os.Setenv("ENV", "local")
 
 		err := godotenv.Load(".env.local")
 		if err != nil {
