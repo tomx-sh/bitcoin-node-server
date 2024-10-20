@@ -20,9 +20,27 @@ func LogRequests(c *fiber.Ctx) error {
 		forwardedIP = c.IP() + " (forwarded for " + forwardedIP + ")"
 	}
 
-	log.Printf("Request from %s: %s %s (User-Agent: %s)", forwardedIP, method, url, userAgent)
+	// If the route is /rpc, concat the bitcoin method to the url
+	if url == "/rpc" {
+		var rpcReq RpcRequest
+		if err := c.BodyParser(&rpcReq); err == nil {
+			url += " " + rpcReq.Method
+		}
+	}
 
-	return c.Next()
+	log.Printf("Request from %s - %s %s (User-Agent: %s)", forwardedIP, method, url, userAgent)
+
+	err := c.Next()
+
+	statusCode := c.Response().StatusCode()
+
+	if err != nil {
+		log.Printf("Response to %s - %d %s", forwardedIP, statusCode, err.Error())
+	} else {
+		log.Printf("Response to %s - %d", forwardedIP, statusCode)
+	}
+
+	return err
 }
 
 func RateLimiterMiddleware() fiber.Handler {
