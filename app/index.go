@@ -14,10 +14,31 @@ type RpcRequest struct {
 }
 
 var allowedMethods = map[string]bool{
-	"getblockchaininfo": true,
-	"getblockhash":      true,
-	"getblock":          true,
-	// Add other allowed methods here
+	"getblockchaininfo":    true,
+	"getblockhash":         true,
+	"getblock":             true,
+	"getblockheader":       true,
+	"getchaintips":         true,
+	"getdifficulty":        true,
+	"getmempoolinfo":       true,
+	"getrawmempool":        true,
+	"getmempoolentry":      true,
+	"getrawtransaction":    true,
+	"decoderawtransaction": true,
+	"getnetworkinfo":       true,
+	"getconnectioncount":   true,
+	"getpeerinfo":          true,
+	"estimatesmartfee":     true,
+	"getmininginfo":        true,
+	"getblocktemplate":     true,
+	"getblockstats":        true,
+	"getblocksubsidy":      true,
+	"getchaintxstats":      true,
+	"gettxoutsetinfo":      true,
+	"gettxout":             true,
+	"gettxoutproof":        true,
+	"getblockfilter":       true,
+	"getbestblockhash":     true,
 }
 
 func main() {
@@ -31,6 +52,10 @@ func main() {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello World!")
+	})
+
+	app.Get("/allowed-methods", func(c *fiber.Ctx) error {
+		return c.JSON(allowedMethods)
 	})
 
 	app.Post("/rpc", func(c *fiber.Ctx) error {
@@ -58,8 +83,8 @@ func main() {
 	// Start the server
 	port := 3000
 
-	fullchain := "/etc/letsencrypt/live/home.tomx.sh/fullchain.pem"
-	privkey := "/etc/letsencrypt/live/home.tomx.sh/privkey.pem"
+	fullchain := os.Getenv("SSL_CERTIFICATES_PATH") + "/fullchain.pem"
+	privkey := os.Getenv("SSL_CERTIFICATES_PATH") + "/privkey.pem"
 
 	// Check if the files exist
 	_, err := os.Stat(fullchain)
