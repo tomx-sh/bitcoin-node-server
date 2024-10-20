@@ -35,9 +35,9 @@ func LogRequests(c *fiber.Ctx) error {
 	statusCode := c.Response().StatusCode()
 
 	if err != nil {
-		log.Printf("Response to %s - %d %s", forwardedIP, statusCode, err.Error())
+		log.Printf("Response to  %s - %d %s", forwardedIP, statusCode, err.Error())
 	} else {
-		log.Printf("Response to %s - %d", forwardedIP, statusCode)
+		log.Printf("Response to  %s - %d", forwardedIP, statusCode)
 	}
 
 	return err

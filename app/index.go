@@ -96,12 +96,12 @@ func main() {
 		// Check if the files exist
 		_, err := os.Stat(fullchain)
 		if err != nil {
-			log.Fatal("Fullchain file not found at", fullchain)
+			log.Fatal("Fullchain file not found at ", fullchain)
 		}
 
 		_, err = os.Stat(privkey)
 		if err != nil {
-			log.Fatal("Privkey file not found at", privkey)
+			log.Fatal("Privkey file not found at ", privkey)
 		}
 
 		log.Fatal(app.ListenTLS(fmt.Sprintf(":%d", port), fullchain, privkey))

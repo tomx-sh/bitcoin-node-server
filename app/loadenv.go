@@ -21,4 +21,5 @@ func LoadEnv() {
 	fmt.Println("RPC_PASSWORD:", os.Getenv("RPC_PASSWORD"))
 	fmt.Println("RPC_URL:", os.Getenv("RPC_URL"))
 	fmt.Println("RPC_API_KEY:", os.Getenv("RPC_API_KEY"))
+	fmt.Println("SSL_CERTIFICATES_PATH:", os.Getenv("SSL_CERTIFICATES_PATH"))
 }
