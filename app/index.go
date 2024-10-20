@@ -4,91 +4,76 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+type RpcRequest struct {
+	Method string        `json:"method"`
+	Params []interface{} `json:"params"`
+}
+
+var allowedMethods = map[string]bool{
+	"getblockchaininfo": true,
+	"getblockhash":      true,
+	"getblock":          true,
+	// Add other allowed methods here
+}
+
 func main() {
 	LoadEnv()
-
 	app := fiber.New()
 
-	// Middleware for API key protection
-	app.Use(func(c *fiber.Ctx) error {
-		// Log all requests
-		log.Printf("Request: %s %s", c.Method(), c.OriginalURL())
+	// Middleware
+	app.Use(LogRequests)
+	app.Use(RateLimiterMiddleware())
+	app.Use(ApiKeyProtection)
 
-		if os.Getenv("RPC_ENV") == "development" {
-			return c.Next()
-		}
-
-		apiKey := c.Get("x-api-key")
-		if apiKey != os.Getenv("RPC_API_KEY") {
-			log.Printf("Unauthorized access with wrong API key")
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
-		}
-		return c.Next()
-	})
-
-	// Define routes
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello World!")
 	})
 
-	app.Get("/get-blockchain-info", func(c *fiber.Ctx) error {
-		result, err := Rpc("getblockchaininfo", nil)
+	app.Post("/rpc", func(c *fiber.Ctx) error {
+		// Parse the incoming request
+		var rpcReq RpcRequest
+		if err := c.BodyParser(&rpcReq); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
+		}
+
+		// Check if the method is allowed
+		if !allowedMethods[rpcReq.Method] {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "Method not allowed"})
+		}
+
+		// Call the Rpc function
+		result, err := Rpc(rpcReq.Method, rpcReq.Params)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 		}
+
+		// Return the result
 		return c.JSON(result)
 	})
-
-	app.Get("/get-network-info", func(c *fiber.Ctx) error {
-		result, err := Rpc("getnetworkinfo", nil)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-		}
-		return c.JSON(result)
-	})
-
-	app.Get("/get-block-count", func(c *fiber.Ctx) error {
-		result, err := Rpc("getblockcount", nil)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-		}
-		return c.JSON(result)
-	})
-
-	app.Get("/get-block-hash", func(c *fiber.Ctx) error {
-		blockHeight := c.Query("blockHeight")
-		if blockHeight == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Block height is required"})
-		}
-		height, _ := strconv.Atoi(blockHeight)
-		result, err := Rpc("getblockhash", []interface{}{height})
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-		}
-		return c.JSON(result)
-	})
-
-	app.Get("/get-block", func(c *fiber.Ctx) error {
-		blockHash := c.Query("blockHash")
-		if blockHash == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Block hash is required"})
-		}
-		result, err := Rpc("getblock", []interface{}{blockHash})
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
-		}
-		return c.JSON(result)
-	})
-
-	// Add more routes based on your original code...
 
 	// Start the server
 	port := 3000
+
+	fullchain := "/etc/letsencrypt/live/home.tomx.sh/fullchain.pem"
+	privkey := "/etc/letsencrypt/live/home.tomx.sh/privkey.pem"
+
+	// Check if the files exist
+	_, err := os.Stat(fullchain)
+	if err != nil {
+		log.Fatal("Fullchain file not found at", fullchain)
+	}
+
+	_, err = os.Stat(privkey)
+	if err != nil {
+		log.Fatal("Privkey file not found at", privkey)
+	}
+
 	fmt.Printf("Server is running on port %d\n", port)
-	log.Fatal(app.Listen(fmt.Sprintf(":%d", port)))
+
+	log.Fatal(app.ListenTLS(fmt.Sprintf(":%d", port), fullchain, privkey))
+	// TODO: use http for development
 }
