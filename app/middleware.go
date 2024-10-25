@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -44,7 +45,11 @@ func LogRequests(c *fiber.Ctx) error {
 }
 
 func RateLimiterMiddleware() fiber.Handler {
-	return limiter.New()
+	// TODO: Make sure it returns an error in a json format in the response body
+	return limiter.New(limiter.Config{
+		Max:        10,
+		Expiration: 1 * time.Second,
+	})
 }
 
 func ApiKeyProtection(c *fiber.Ctx) error {
