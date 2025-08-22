@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -83,27 +82,5 @@ func main() {
 	// Start the server
 	port := 3000
 	fmt.Printf("Server is running on port %d\n", port)
-
-	if os.Getenv("RPC_ENV") == "development" {
-		// Use http in development
-		log.Fatal(app.Listen(fmt.Sprintf(":%d", port)))
-
-	} else {
-		// Use https in production
-		fullchain := os.Getenv("SSL_CERTIFICATES_PATH") + "/fullchain.pem"
-		privkey := os.Getenv("SSL_CERTIFICATES_PATH") + "/privkey.pem"
-
-		// Check if the files exist
-		_, err := os.Stat(fullchain)
-		if err != nil {
-			log.Fatal("Fullchain file not found at ", fullchain)
-		}
-
-		_, err = os.Stat(privkey)
-		if err != nil {
-			log.Fatal("Privkey file not found at ", privkey)
-		}
-
-		log.Fatal(app.ListenTLS(fmt.Sprintf(":%d", port), fullchain, privkey))
-	}
+	log.Fatal(app.Listen(fmt.Sprintf(":%d", port)))
 }
