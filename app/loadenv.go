@@ -16,8 +16,8 @@ func LoadEnv() {
 		fmt.Println(".env loaded successfully.")
 	}
 
-	fmt.Println("RPC_USERNAME:", os.Getenv("RPC_USERNAME"))
-	fmt.Println("RPC_PASSWORD:", os.Getenv("RPC_PASSWORD"))
+	//fmt.Println("RPC_USERNAME:", os.Getenv("RPC_USERNAME"))
+	//fmt.Println("RPC_PASSWORD:", os.Getenv("RPC_PASSWORD"))
 	fmt.Println("RPC_URL:", os.Getenv("RPC_URL"))
-	fmt.Println("RPC_API_KEY:", os.Getenv("RPC_API_KEY"))
+	//fmt.Println("RPC_API_KEY:", os.Getenv("RPC_API_KEY"))
 }
